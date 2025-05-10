@@ -1,8 +1,5 @@
-508047:Your Add Balance is:30000.0
-508048:Your deposit amount is:309000.0
-508048:Your withdraw amount is:3000.0
-508048:Your Add Balance is:300000.0
-508049:Your deposit amount is:20000.0
-508049:Your withdraw amount is:2000.0
-508049:Your Add Balance is:200000.0
-508050:Your deposit amount is:380000.0:{'date': '2025:05:08 14:42:50'}
+508034:Your Add Balance is:3000000.0
+508034:Your deposit amount is: 20000.0
+508034:Your withdraw amount is: 29900.0
+508034:Your balance is: 2990100.0
+508034:Your deposit amount is: 0.0

@@ -1,4 +1,5 @@
 #credentials
+
 CREDENTIALS_FILE = 'user.txt'
 ACCOUNT_NUMBER_FILE = 'last_account_number.txt'
 transaction_history_file ='transaction_history.txt'
@@ -39,6 +40,7 @@ def read_credentials(file_path):
 
 
 # Create a new bank account
+
 def create_account():
     global new_account_number
 
@@ -47,14 +49,14 @@ def create_account():
     password = input('Enter your password: ')
 
     print("Choose account type:")
-    print("1. Savings💰")
-    print("2. Checking🏦")
+    print("1. Saving_account💰")
+    print("2. Current_account🏦")
     account_type_choice = input("Enter choice (1 or 2): ")
 
     if account_type_choice == '1':
-        account_type = 'Savings'
+        account_type = 'Saving_account'
     elif account_type_choice == '2':
-        account_type = 'Checking'
+        account_type = 'Current_accountS'
     else:
         print("Invalid account type selected😏.")
         return
@@ -70,6 +72,7 @@ def create_account():
         return
 
     #account details
+
     accounts[new_account_number] = {
         'name': name,
         'username': username,
@@ -80,11 +83,13 @@ def create_account():
     }
 
     #account details to 'account_details.txt'
+
     with open('account_details.txt', 'a') as file:
         file.write(f'{new_account_number}:{name}:{username}:{account_type}:{balance}\n')
         
 
     #edentials file to 'user.txt'
+
     with open(CREDENTIALS_FILE, 'a') as file:
         file.write(f'{username}:{password}:user\n')
 
@@ -99,92 +104,180 @@ def create_account():
 
 
 # Deposit money 
+
 def deposit_money():
     try:
         acc = int(input("Enter account number: "))
-        if acc not in accounts:
-            print("Account does not exist😒👎🏻.")
-            return
-        amount = float(input("Enter deposit amount: "))
-        if amount <= 0:
-            print("Amount must be a positive number.")
-            return
-        accounts[acc]["balance"] += amount
-        accounts[acc]["transactions"].append(f"Deposited: {amount}")
+        
+        
+        with open("account_details.txt", 'r') as file:
+            lines = file.readlines()
+        
+        account_found = False  
+        updated_lines = []  
+        
+        for line in lines:
+            getAcc = line.strip().split(":")  
+            
+            if int(getAcc[0]) == acc:
+                account_found = True
+                amount = float(input("Enter deposit amount: "))
+                
+                if amount <= 0:
+                    print("Amount must be a positive number. ❌")
+                else:
+                    balance = float(getAcc[4])
+                    balance += amount
+                    getAcc[4] = str(balance)  
+                    
+                    print(f"New balance is: {balance} ✅")
+                
+                updated_lines.append(":".join(getAcc) + "\n")
+            else:
+                updated_lines.append(line)  
 
-        print("Deposit successfully!✅")
-        with open(transaction_history_file, 'a') as file:
-            file.write(f'{new_account_number}:Your deposit amount is:{amount}\n')
+        if not account_found:
+            print("Account does not exist. 😒👎🏻")
+        
+        
+        with open("account_details.txt", 'w') as file:
+            file.writelines(updated_lines)
+
+        
+        with open("transaction_history.txt", 'a') as file:
+            file.write(f'{acc}:Your deposit amount is: {amount}\n')
+
+        print("Deposit successful! ✅")
+
     except ValueError:
-        print("Invalid input❌.")
+        print("Invalid input ❌.")
 
 
 # Withdraw money 
+
 def withdraw_money():
     try:
         acc = int(input('Enter account number: '))
-        if acc not in accounts:
-            print("Account does not exist😒.")
-            return
-        amount = float(input("Enter withdrawal amount: "))
-        if amount <= 0:
-            print("Amount must be positive.")
-            return
+        with open("account_details.txt", 'r') as file:
+            lines = file.readlines()
 
-        account_type = accounts[acc].get('account_type', 'Savings')
-        balance = accounts[acc]['balance']
+        account_found = False  
+        updated_lines = []  
+        
+        for line in lines:
+            getAcc = line.strip().split(":")  
+            
+            if int(getAcc[0]) == acc:
+                account_found = True
+                amount = float(input("Enter withdraw amount: "))
 
-        if account_type == 'Checking':
-            overdraft_limit = 500
-            if amount > balance + overdraft_limit:
-                print("Overdraft limit exceeded🤷‍♂.")
-                return
-        else:
-            if amount > balance:
-                print("Insufficient balance😏.")
-                return
+                if amount <= 0:
+                    print("Amount must be a positive number. ❌")
+                else:
+                    balance = float(getAcc[4])
+                    balance -= amount
+                    getAcc[4] = str(balance)  
+                    
+                    print(f"New balance is: {balance} ✅")
+                
+                updated_lines.append(":".join(getAcc) + "\n")
+            else:
+                updated_lines.append(line)  
 
-        accounts[acc]['balance'] -= amount
-        accounts[acc]['transactions'].append(f"Withdraw: {amount}")
-        print("Withdrawal successful💴✅.")
+        if not account_found:
+            print("Account does not exist. 😒👎🏻")
+        
+        
+        with open("account_details.txt", 'w') as file:
+            file.writelines(updated_lines)
 
-        with open(transaction_history_file, 'a') as file:
-            file.write(f'{new_account_number}:Your withdraw amount is:{amount}\n')
+        
+        with open("transaction_history.txt", 'a') as file:
+            file.write(f'{acc}:Your withdraw amount is: {amount}\n')
+
+        print("Withdraw successful! ✅")
+
     except ValueError:
-        print("Invalid input❌.")
+        print("Invalid input ❌.")
 
 
 # Check  balance
+
 def check_balance():
     try:
         acc = int(input("Enter account number: "))
-        if acc in accounts:
-            print(f"Account Type: {accounts[acc].get('account_type', 'Unknown')}")
-            print(f"Current balance: {accounts[acc]['balance']}")
+        with open("account_details.txt", 'r') as file:
+            lines = file.readlines()
+        
+        account_found = False  
+        updated_lines = []  
+        
+        for line in lines:
+            getAcc = line.strip().split(":")  
+            
+            if int(getAcc[0]) == acc:
+                account_found = True
+                balance=getAcc[4]
+                print(f"New balance is:{balance} ✅")
+            updated_lines.append(":".join(getAcc) + "\n")
+        
         else:
+            updated_lines.append(line)
+        if not account_found:
             print("Account does not exist😒.")
+
+        with open("account_details.txt", 'w') as file:
+            file.writelines(updated_lines)
+
+        
+        with open("transaction_history.txt", 'a') as file:
+            file.write(f'{acc}:Your balance is: {balance}\n')
+
     except ValueError:
         print("Invalid input❌.")
 
 
 #transaction history
+
 def transaction_history():
     try:
         acc = int(input("Enter account number: "))
-        if acc in accounts:
-            print(f"Account Type: {accounts[acc].get('account_type', 'Unknown')}")
-            print("💸Transaction history:")
-            for t in accounts[acc]['transactions']:
-                print("-", t)
+        
+        # Read account details
+        with open("account_details.txt", 'r') as file:
+            lines = file.readlines()
+        
+        account_found = False
 
+        for line in lines:
+            getAcc = line.strip().split(":")  
+            
+            if int(getAcc[0]) == acc:
+                account_found = True
                 
-        else:
-            print("Account does not exist😒.")
+                
+                try:
+                    with open("transaction_history.txt", 'r') as file:
+                        transactions = file.readlines()
+                    
+                    print(f"Transaction history for account {acc}:")
+                    
+                    for transaction in transactions:
+                        if transaction.startswith(f"{acc}:"):
+                            print(transaction.strip())  # Display transactions
+                    
+                except FileNotFoundError:
+                    print("No transaction history found.")
+
+        if not account_found:
+            print("Account does not exist 😒.")
+
     except ValueError:
-        print("Invalid input❌.")
+        print("Invalid input ❌.")
 
 
 #Main banking menu-driven interface
+
 def main_menu():
     while True:
         print("\n-----🏦💸Mini Banking System💸🏦-----")
@@ -208,13 +301,38 @@ def main_menu():
         elif choice == '5':
             transaction_history()
         elif choice == '6':
-            print("🏦😉Thank you for using the Mini Banking System🫡🙏.")
+            print("🏦😉Thank you for using the Mini Banking System!!🫡🙏.")
             break
         else:
             print("Invalid option. Please choose between 1 to 6😊.")
 
+def user_menu():
+    while True:
+        print("\n-----🏦💸Mini Banking System💸🏦-----")
+        print("1. Deposit money💸")
+        print("2. Withdraw money💴")
+        print("3. Check balance💰")
+        print("4. Transaction history💱")
+        print("5. Exit")
+
+        choice = input("Choose an option (1-5): ")
+        if choice == '1':
+            deposit_money()
+        elif choice == '2':
+            withdraw_money()
+        elif choice == '3':
+            check_balance()
+        elif choice == '4':
+            transaction_history()
+        elif choice == '5':
+            print("🏦😉Thank you for using the Mini Banking System🫡🙏.")
+            break
+        else:
+            print("Invalid option. Please choose between 1 to 5😊.")
+
 
 # Login system based on credentials
+
 def login(creds):
     input_username = input("Enter the username: ")
     input_password = input("Enter the password: ")
@@ -222,13 +340,17 @@ def login(creds):
     if input_username in creds and creds[input_username]['password'] == input_password:
         role = creds[input_username]['role']
         print(f"Login successful✅. Role: {role}")
-        if role in ['admin', 'user']:
+        if role in ['admin']:
             main_menu()
+        else:
+            role in ['user']
+            user_menu()
     else:
         print("Login failed. Wrong credentials😒❌.")
 
 
 # Main entry point
+
 def main():
     global new_account_number
     new_account_number = load_last_account_number()
